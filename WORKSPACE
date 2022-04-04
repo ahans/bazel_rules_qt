@@ -5,12 +5,12 @@ load("@com_justbuchanan_rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchai
 
 qt_configure()
 
-load("@local_config_qt//:local_qt.bzl", "local_qt_path")
+load("@local_config_qt//:local_qt.bzl", "local_qt_include_path")
 
 new_local_repository(
     name = "qt",
     build_file = "@com_justbuchanan_rules_qt//:qt.BUILD",
-    path = local_qt_path(),
+    path = local_qt_include_path(),
 )
 
 register_qt_toolchains()

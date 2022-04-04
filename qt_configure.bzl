@@ -43,19 +43,34 @@ def qt_autoconf_impl(repository_ctx):
         print("Installation available on the default path: ", default_qt_path)
 
     qt_path = _get_env_var(repository_ctx, "BAZEL_RULES_QT_DIR", default_qt_path)
-    if qt_path != default_qt_path:
-        print("However BAZEL_RULES_QT_DIR is defined and will be used: ", qt_path)
+    qt_include_path = qt_path + "/include"
+    qt_bin_path = qt_path + "/bin"
+    qt_lib_path = qt_path + "/lib"
 
-        # In Linux in case that we have a standalone installation, we need to provide the path inside the include folder
-        qt_path_with_include = qt_path + "/include"
-        if is_linux_machine and repository_ctx.path(qt_path_with_include).exists:
-            qt_path = qt_path_with_include
-   
+    if not repository_ctx.path(qt_include_path).exists:
+        fail("Qt include path does not exist: " + qt_include_path)
+    if not repository_ctx.path(qt_bin_path).exists:
+        fail("Qt bin path does not exist: " + qt_bin_path)
+    if not repository_ctx.path(qt_lib_path).exists:
+        fail("Qt lib path does not exist: " + qt_lib_path)
+
+    # if qt_path != default_qt_path:
+    #     print("However BAZEL_RULES_QT_DIR is defined and will be used: ", qt_path)
+
+    #     # In Linux in case that we have a standalone installation, we need to provide the path inside the include folder
+    #     qt_path_with_include = qt_path + "/include"
+    #     if is_linux_machine and repository_ctx.path(qt_path_with_include).exists:
+    #         qt_path = qt_path_with_include
+
     repository_ctx.file("BUILD", "# empty BUILD file so that bazel sees this as a valid package directory")
     repository_ctx.template(
         "local_qt.bzl",
         repository_ctx.path(Label("//:BUILD.local_qt.tpl")),
-        {"%{path}": qt_path},
+        {
+            "%{include_path}": qt_include_path,
+            "%{bin_path}": qt_bin_path,
+            "%{lib_path}": qt_lib_path,
+        },
     )
 
 qt_autoconf = repository_rule(

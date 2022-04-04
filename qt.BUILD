@@ -1,5 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_import", "cc_library")
 
+load("@local_config_qt//:local_qt.bzl", "local_qt_lib_path")
+
+
 QT_LIBRARIES = [
     ("core", "QtCore", "Qt5Core", []),
     ("network", "QtNetwork", "Qt5Network", []),
@@ -8,7 +11,7 @@ QT_LIBRARIES = [
     ("qml", "QtQml", "Qt5Qml", [":qt_core", ":qt_network"]),
     ("qml_models", "QtQmlModels", "Qt5QmlModels", []),
     ("gui", "QtGui", "Qt5Gui", [":qt_core"]),
-    ("opengl", "QtOpenGL", "Qt5OpenGL", []),
+    # ("opengl", "QtOpenGL", "Qt5OpenGL", []),
 ]
 
 [
@@ -17,7 +20,8 @@ QT_LIBRARIES = [
         # When being on Windows this glob will be empty
         hdrs = glob(["%s/**" % include_folder], allow_empty = True),
         includes = ["."],
-        linkopts = ["-l%s" % library_name],
+        linkopts = ["-l%s" % library_name] + ["-L {}".format(local_qt_lib_path())],
+        defines = ["QT_NO_OPENGL"],
         # Available from Bazel 4.0.0
         # target_compatible_with = ["@platforms//os:linux"],
     )
